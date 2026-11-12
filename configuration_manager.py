@@ -65,6 +65,18 @@ class ConfigurationManager:
         Returns default if key not found.
         """
 
+        if "." in key:
+            primary_key = key.split(".")[0]
+            secondary_key = key.split(".")[1]
+
+            if primary_key in self.config:
+                return self.config[primary_key][secondary_key]
+
+        if key in self.config:            
+            return self.config[key]
+        else:
+            return default
+
     def save(self, output_file=None):
         """Save current configuration to file."""
         # Save to file (auto-detect format from extension)

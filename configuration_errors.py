@@ -8,13 +8,16 @@ class ConfigurationError(Exception):
         super().__init__()
 
 class ConfigFileNotFoundError(ConfigurationError):
-    """Exception for when file does not exist"""
+    """Exception for when file does not exist."""
 
     def __init__(self):
         super().__init__()
 
 class ConfigParseError(ConfigurationError):
-    """Exception for reading invalid data"""
+    """Exception for reading invalid data."""
 
     def __init__(self):
         super().__init__()
+
+class ConfigValidationError(ConfigurationError):
+    """Exception for failed validation checks."""

@@ -57,7 +57,7 @@ class TestConfigurationManagerGet(unittest.TestCase):
                 'robot_id': 'test_robot',
                 'sensors': {'ir_count': 4, 'threshold': 0.5}
             }, f)
-        self.config = ConfigurationManager(self.valid_file)
+        self.config_file = ConfigurationManager(self.valid_file)
 
     def tearDown(self):
         if os.path.exists(self.valid_file):
@@ -65,18 +65,16 @@ class TestConfigurationManagerGet(unittest.TestCase):
 
     def test_get_simple_key(self):
         """get() returns correct value for a top-level key."""
-        # YOUR CODE HERE
-        pass
+        
+        self.assertEqual(self.config_file.get("robot_id"), "test_robot")
 
     def test_get_nested_key_dot_notation(self):
         """get() returns correct value for a nested key using dot notation."""
-        # YOUR CODE HERE — e.g., config.get('sensors.ir_count') should return 4
-        pass
+        self.assertEqual(self.config_file.get('sensors.ir_count'), 4)
 
     def test_get_missing_key_returns_default(self):
         """get() returns the provided default when key does not exist."""
-        # YOUR CODE HERE
-        pass
+        self.assertEqual(self.config_file.get("default_test"), None)
 
 
 class TestConfigurationManagerValidate(unittest.TestCase):
