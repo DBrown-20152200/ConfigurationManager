@@ -3,6 +3,7 @@ import yaml
 import xml.etree.ElementTree as ET
 import os
 from configuration_errors import *
+from RobotBase import Battery, Motor, Sensor, RobotBase
 
 class ConfigurationManager:
     """Manages robot configurations from files."""
@@ -11,13 +12,14 @@ class ConfigurationManager:
         """Initialize with configuration file path."""
         self.config_file = config_file
         self.config = {}
+        self.extension = str
         self.load()
 
-    def verify_file(self):
+    def verify_file(self, file):
         """Check if file exists."""
 
         try:
-            open(self.config_file, "r")
+            open(file, "r")
         except:
             raise ConfigFileNotFoundError
 
@@ -40,18 +42,18 @@ class ConfigurationManager:
         """Load configuration from file (auto-detect format)."""
 
         # Check if file exists
-        self.verify_file()
+        self.verify_file(self.config_file)
 
         # Determine format from file extension
-        extension = self.config_file.split(".")[1]
+        self.extension = self.config_file.split(".")[1]
 
         # Parse appropriate format and save in config
         try:
-            if extension == "json":
+            if self.extension == "json":
                 self.parse_json()
-            elif extension == "yaml":
+            elif self.extension == "yaml":
                 self.parse_yaml()
-            elif extension == "xml":
+            elif self.extension == "xml":
                 self.parse_xml()
             else:
                 raise ConfigurationError
@@ -79,7 +81,12 @@ class ConfigurationManager:
 
     def save(self, output_file=None):
         """Save current configuration to file."""
-        # Save to file (auto-detect format from extension)
+
+        self.verify_file(output_file)
+
+        if self.extension == "json":
+            with open(output_file, "w") as f:
+                json.dump(self.config, f)
 
     def validate(self) -> None:
         """Validate configuration data.
@@ -87,7 +94,18 @@ class ConfigurationManager:
         Raises:
             ConfigValidationError: If any validation checks fail.
         """
+        required_fields = {"robot_name":str, "battery":Battery, "motor":Motor, "sensor":Sensor}
+
         # Check required fields exist
-        # Check data types are correct
+        for key in self.config.keys():
+            if key not in required_fields:
+                raise ConfigValidationError
+
+        # Check data types are correct'
+        for key in self.config.keys():
+            if type(self.config[key]) != type(required_fields):
+                raise ConfigValidationError
+            
         # Check values are in valid ranges
-        # Raise ConfigValidationError with all errors if any fail
+        for item in required_fields:
+            pass

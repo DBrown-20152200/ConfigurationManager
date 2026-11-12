@@ -4,9 +4,8 @@ import json
 import yaml
 import xml.etree.ElementTree as ET
 from configuration_errors import *
-
 from configuration_manager import ConfigurationManager
-
+from RobotBase import Battery, Motor, Sensor, RobotBase
 
 class TestConfigurationManagerLoad(unittest.TestCase):
 
@@ -29,6 +28,8 @@ class TestConfigurationManagerLoad(unittest.TestCase):
         """Remove test files created during tests."""
         if os.path.exists(self.valid_file):
             os.remove(self.valid_file)
+        if os.path.exists(self.corrupt_file):
+             os.remove(self.corrupt_file)
 
     def test_load_valid_json(self):
         """ConfigurationManager loads a valid JSON file without error."""
@@ -79,10 +80,25 @@ class TestConfigurationManagerGet(unittest.TestCase):
 
 class TestConfigurationManagerValidate(unittest.TestCase):
 
+    def setUp(self):
+        self.valid_file = 'test_valid_config.json'
+        self.test_data = {'robot_name': 'test_robot', 
+                          'battery': Battery(100,100), 
+                          'motor':Motor(0), 
+                          'sensor':Sensor('ir sensor')}
+        with open(self.valid_file, 'w') as f:
+            json.dump(self.test_data, f)
+
+        self.config_file = ConfigurationManager(self.valid_file)
+
+    def tearDown(self):
+        if os.path.exists(self.valid_file):
+            os.remove(self.valid_file)
+
     def test_valid_config_passes_validation(self):
         """validate() does not raise when config data is valid."""
-        # YOUR CODE HERE
-        pass
+
+        self.config_file.validate()
 
     def test_missing_required_field_raises_validation_error(self):
         """ConfigValidationError raised when a required field is absent."""

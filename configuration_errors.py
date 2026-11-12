@@ -21,3 +21,6 @@ class ConfigParseError(ConfigurationError):
 
 class ConfigValidationError(ConfigurationError):
     """Exception for failed validation checks."""
+
+    def __init__(self):
+        super().__init__()
