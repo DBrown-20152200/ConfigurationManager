@@ -4,4 +4,17 @@ class ConfigurationError(Exception):
     All ConfigurationManager exceptions inherit from this,
     allowing for catching broad errors or specialising into specific errors.
     """
-    pass
+    def __init__(self):
+        super().__init__()
+
+class ConfigFileNotFoundError(ConfigurationError):
+    """Exception for when file does not exist"""
+
+    def __init__(self):
+        super().__init__()
+
+class ConfigParseError(ConfigurationError):
+    """Exception for reading invalid data"""
+
+    def __init__(self):
+        super().__init__()

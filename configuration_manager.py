@@ -1,3 +1,9 @@
+import json
+import yaml
+import xml.etree.ElementTree as ET
+import os
+from configuration_errors import *
+
 class ConfigurationManager:
     """Manages robot configurations from files."""
 
@@ -7,33 +13,50 @@ class ConfigurationManager:
         self.config = {}
         self.load()
 
+    def verify_file(self):
+        """Check if file exists."""
+
+        try:
+            open(self.config_file, "r")
+        except:
+            raise ConfigFileNotFoundError
+
     def parse_json(self):
-        """For parsing JSON formatted files."""
-        pass
+        """Parse JSON formatted files."""
+
+        with open(self.config_file, "r") as file:
+            self.config = json.load(file)
+            file.close()
 
     def parse_yaml(self):
-        """For parsing YAML formatted files."""
+        """Parse YAML formatted files."""
         pass
 
     def parse_xml(self):
-        """For parsing XML formatted files."""
+        """Parse XML formatted files."""
         pass
 
     def load(self):
         """Load configuration from file (auto-detect format)."""
 
+        # Check if file exists
+        self.verify_file()
+
         # Determine format from file extension
         extension = self.config_file.split(".")[1]
 
-        # Parse appropriate format
-        if extension == "json":
-            self.config = self.parse_json()
-        elif extension == "yaml":
-            self.config = self.parse_yaml()
-        elif extension == "xml":
-            self.config = self.parse_xml()
-
-        # Store in self.config
+        # Parse appropriate format and save in config
+        try:
+            if extension == "json":
+                self.parse_json()
+            elif extension == "yaml":
+                self.parse_yaml()
+            elif extension == "xml":
+                self.parse_xml()
+            else:
+                raise ConfigurationError
+        except:
+            raise ConfigParseError
 
     def get(self, key, default=None):
         """Safely retrieve configuration value.
@@ -56,5 +79,3 @@ class ConfigurationManager:
         # Check data types are correct
         # Check values are in valid ranges
         # Raise ConfigValidationError with all errors if any fail
-
-test = ConfigurationManager("json_config.json")

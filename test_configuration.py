@@ -1,10 +1,9 @@
-# test_configuration.py — fill in the test bodies
-
 import unittest
 import os
 import json
 import yaml
 import xml.etree.ElementTree as ET
+from configuration_errors import *
 
 from configuration_manager import ConfigurationManager
 
@@ -14,8 +13,17 @@ class TestConfigurationManagerLoad(unittest.TestCase):
     def setUp(self):
         """Create a minimal valid config file for use in tests."""
         self.valid_file = 'test_valid_config.json'
+        self.test_data = {'robot_id': 'test_robot', 'battery_level': 100}
         with open(self.valid_file, 'w') as f:
-            json.dump({'robot_id': 'test_robot', 'battery_level': 100}, f)
+            json.dump(self.test_data, f)
+
+        self.corrupt_file = "test_corrupt_config.json"
+        self.invalid_data = ['robot_id', 'test_robot', 'battery_level', 100]
+
+        with open(self.corrupt_file, "w") as cf:
+            cf.write(f"{self.invalid_data}")
+
+        self.config_test = ConfigurationManager(self.valid_file)
 
     def tearDown(self):
         """Remove test files created during tests."""
@@ -24,18 +32,20 @@ class TestConfigurationManagerLoad(unittest.TestCase):
 
     def test_load_valid_json(self):
         """ConfigurationManager loads a valid JSON file without error."""
-        # YOUR CODE HERE
-        pass
+
+        self.assertEqual(self.config_test.config, self.test_data)
 
     def test_load_missing_file_raises_error(self):
         """ConfigFileNotFoundError raised when file does not exist."""
-        # YOUR CODE HERE — hint: use self.assertRaises()
-        pass
+
+        with self.assertRaises(ConfigFileNotFoundError):
+            ConfigurationManager("invalid_file.json")
 
     def test_load_corrupted_file_raises_error(self):
         """ConfigParseError raised when file contains invalid JSON/XML/YAML."""
-        # YOUR CODE HERE — create a temp file with invalid content, then load it
-        pass
+
+        with self.assertRaises(ConfigParseError):
+            self.config_test = ConfigurationManager(self.corrupt_file)
 
 
 class TestConfigurationManagerGet(unittest.TestCase):
